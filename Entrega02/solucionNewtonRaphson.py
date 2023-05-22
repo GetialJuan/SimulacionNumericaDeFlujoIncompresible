@@ -57,3 +57,17 @@ for x in range(1, 7):
 #             ecuacion_no_lineal = Vx(x+1,y)*(2-vx) - 8*Vx(x,y) + Vx(x-1,y)*(2+vx) + Vx(x,y+1)*(2-vy) + Vx(x,y-1)*(2+vy)
 #             ecuaciones_vy.append(ecuacion_no_lineal)
 
+def jacobiano(ecuaciones, vars):
+    jacobiano = []
+    for ecuacion in ecuaciones:
+        fila = []
+        for var in vars:
+            derivada = ecuacion.diff(var)
+            fila.append(derivada)
+        jacobiano.append(fila)
+        print(fila)
+
+vars_vx.append(vx)
+vars_vx.append(vy)
+
+jacobiano(ecuaciones_vx, vars_vx)
