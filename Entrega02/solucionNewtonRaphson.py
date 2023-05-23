@@ -59,15 +59,40 @@ for x in range(1, 7):
 
 def jacobiano(ecuaciones, vars):
     jacobiano = []
+
     for ecuacion in ecuaciones:
         fila = []
         for var in vars:
             derivada = ecuacion.diff(var)
             fila.append(derivada)
         jacobiano.append(fila)
-        print(fila)
+    
+    return jacobiano
 
-vars_vx.append(vx)
-vars_vx.append(vy)
 
-jacobiano(ecuaciones_vx, vars_vx)
+jacobiano_vx = jacobiano(ecuaciones_vx, vars_vx)
+
+def evalFunction(function, vars, values):
+    result = function
+    numVars = len(vars)
+
+    for i in range(0, numVars):
+        result = result.subs(vars[i], values[i])
+    
+    return result
+
+def evalJacobiano(jacobiano, vars, values):
+    jacobiano_evaluated = []
+
+    for fila in jacobiano:
+        fila_evaluated = []
+        for diff in fila:
+            diff_evaluated = evalFunction(diff, vars, values)
+            fila_evaluated.append(diff_evaluated)
+        jacobiano_evaluated.append(fila_evaluated)
+
+    return jacobiano_evaluated
+
+
+
+print(evalJacobiano(jacobiano_vx, vars_vx, range(0,22)))
