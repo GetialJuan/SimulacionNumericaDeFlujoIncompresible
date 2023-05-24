@@ -7,15 +7,13 @@ import numpy as np
 
 # GENERANDO LOS SISTEMAS DE ECUACIONES NO LINEALES
 
-
 Vo = 1
 condiciones_frontera = [(3,1), (3,2), (4,1), (4,2),
                         (5,4), (5,5), (6,4), (6,5)]
-vx = Symbol("vx")
-vy = Symbol("vy")
 
 ecuaciones_vx = []
 vars_vx = []
+
 ecuaciones_vy = []
 
 # Funcion Vx(x, y)
@@ -45,6 +43,8 @@ def Vy(x, y):
 # Generando las ecuaciones de Vx
 for x in range(1, 7):
     for y in range(1, 7):
+        vx = Vx(x,y)
+        vy = Vx(x,y)
         if Vx(x,y) != 0:
             ecuacion_no_lineal = Vx(x+1,y)*(2-vx) - 8*Vx(x,y) + Vx(x-1,y)*(2+vx) + Vx(x,y+1)*(2-vy) + Vx(x,y-1)*(2+vy)
             ecuaciones_vx.append(ecuacion_no_lineal)
@@ -70,8 +70,6 @@ def jacobiano(ecuaciones, vars):
     return jacobiano
 
 
-jacobiano_vx = jacobiano(ecuaciones_vx, vars_vx)
-
 def evalFunction(function, vars, values):
     result = function
     numVars = len(vars)
@@ -79,7 +77,7 @@ def evalFunction(function, vars, values):
     for i in range(0, numVars):
         result = result.subs(vars[i], values[i])
     
-    return result
+    return eval(str(result)) # cast sympy type to int type
 
 def evalJacobiano(jacobiano, vars, values):
     jacobiano_evaluated = []
@@ -93,6 +91,49 @@ def evalJacobiano(jacobiano, vars, values):
 
     return jacobiano_evaluated
 
+def evalFunctions(fuctions, vars, values):
+    functions_evaluated = []
+    for function in fuctions:
+        function_evaluated = evalFunction(function, vars, values)
+        functions_evaluated.append(function_evaluated)
+    return functions_evaluated
+
+def stop(solution1, solution0):
+    x1 = np.array(solution1)
+    x0 = np.array(solution0)
+
+    norm = np.linalg.norm(x1-x0)
+
+    if norm < TOL:
+        return True
+    else:
+        return False
 
 
-print(evalJacobiano(jacobiano_vx, vars_vx, range(0,22)))
+
+# Solucionando los sistemas
+
+TOL = 0.001
+INITIAL_POINT = [0]*len(vars_vx)
+
+def solveSystem(ecuacions, vars):
+    solution0 = INITIAL_POINT
+    jacobiano_ = jacobiano(ecuacions, vars)
+
+    while True:
+        jacobiano_evaluated = np.array(evalJacobiano(jacobiano_, vars, solution0))
+        jacobiano_inv = np.linalg.inv(jacobiano_evaluated)
+
+        functions_evaluated = np.array(evalFunctions(ecuacions, vars, solution0))
+
+        solution1 = np.array(solution0) - (jacobiano_inv.dot(functions_evaluated))
+
+        if stop(solution1, solution0):
+            return solution1
+        else:
+            solution0 = solution1 
+
+print(solveSystem(ecuaciones_vx, vars_vx))
+
+# print(type(Float(Symbol('x').subs(Symbol('x'), 1).evalf(), 2)))
+# print(type(eval(str(Symbol('x').subs(Symbol('x'), 1)))))
