@@ -61,6 +61,15 @@ for x in range(1, 7):
             ecuaciones_vy.append(ecuacion_no_lineal)
             vars_vy.append(Vy(x,y))
 
+# Imprimiendo los sistemas obtenidos
+print('\n/////////////////////////////////////\nECUACIONES DE LA VELOCIDAD EN X')
+for ecuacion in ecuaciones_vx:
+    print(ecuacion)
+
+print('\n/////////////////////////////////////\nECUACIONES DE LA VELOCIDAD EN Y')
+for ecuacion in ecuaciones_vy:
+    print(ecuacion)
+
 # Funciones axiliares para implementar el metodo de Newton Raphson
 
 def jacobiano(ecuaciones, vars):
@@ -104,11 +113,11 @@ def evalFunctions(fuctions, vars, values):
         functions_evaluated.append(function_evaluated)
     return functions_evaluated
 
-def stop(solution1, solution0):
-    x1 = np.array(solution1)
-    x0 = np.array(solution0)
+# Funcion que representa el criterio de convergencia
+def stop(ecuacions, vars, solution):
+    eval_solution = np.array(evalFunctions(ecuacions, vars, solution))
 
-    norm = np.linalg.norm(x1-x0)
+    norm = np.linalg.norm(eval_solution)
 
     if norm < TOL:
         return True
@@ -121,11 +130,12 @@ def stop(solution1, solution0):
 
 TOL = 0.001
 APROXIMATION_VX = [0]*len(vars_vx)
-APROXIMATION_VY = [20]*len(vars_vx)
+APROXIMATION_VY = [2]*len(vars_vy)
 
 def newtonRaphson(ecuacions, vars, aproximation):
     solution0 = aproximation
     jacobiano_ = jacobiano(ecuacions, vars)
+    iterations = 0
 
     while True:
         jacobiano_evaluated = np.array(evalJacobiano(jacobiano_, vars, solution0))
@@ -135,24 +145,34 @@ def newtonRaphson(ecuacions, vars, aproximation):
 
         solution1 = np.array(solution0) - (jacobiano_inv.dot(functions_evaluated))
 
-        if stop(solution1, solution0):
+        if iterations >= 100 or stop(ecuacions, vars, solution1):
+            print(iterations)
             return solution1
         else:
             solution0 = solution1 
+        iterations += 1
 
-#solution_vx = newtonRaphson(ecuaciones_vx, vars_vx, APROXIMATION_VX)
+solution_vx = newtonRaphson(ecuaciones_vx, vars_vx, APROXIMATION_VX)
 solution_vy = newtonRaphson(ecuaciones_vy, vars_vy, APROXIMATION_VY)
 
-#print(solution_vy)
-#print(solution_vx)
 
-print(solution_vy)
-#print(solution_vx)
-print('////////////////////////////////////7')
-print(evalFunctions(ecuaciones_vy, vars_vy, solution_vy))
-#print(evalFunctions(ecuaciones_vx, vars_vx, solution_vx))
+# Imprimiendo las soluciones
+print('\n////////////////////////////////////\nSOLUCION PARA LA VELOCIDAD EN X:')
+for i in range(0, len(vars_vx)):
+    print('{} = {}'.format(vars_vx[i], solution_vx[i]))
 
-# [0.43495066 0.1830132  0.07819786 0.0338344  0.0129013  0.4844767
-# 0.20501969 0.0937777  0.04387608 0.0176665  0.03860489 0.02843757
-# 0.01350639 0.03155211 0.01702425 0.0076619  0.43376138 0.17933274
-# 0.07136468 0.48233503 0.19741128 0.06952999]
+print('\n////////////////////////////////////\nSOLUCION PARA LA VELOCIDAD EN Y:')
+for i in range(0, len(vars_vy)):
+    print('{} = {}'.format(vars_vy[i], solution_vy[i]))
+
+print('\n////////////////////////////////////\nPROBANDO LAS SOLUCIONES:')
+
+print('RESULTADO DE EVALUAR EL VECTOR SOLUCION DE LA VELOCIDAD EN X:')
+Vx_functions_evaluated = evalFunctions(ecuaciones_vx, vars_vx, solution_vx)
+for function_evaluated in Vx_functions_evaluated:
+    print(function_evaluated)
+
+print('\nRESULTADO DE EVALUAR EL VECTOR SOLUCION DE LA VELOCIDAD EN Y:')
+Vy_functions_evaluated = evalFunctions(ecuaciones_vy, vars_vy, solution_vy)
+for function_evaluated in Vy_functions_evaluated:
+    print(function_evaluated)
