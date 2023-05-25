@@ -15,6 +15,7 @@ ecuaciones_vx = []
 vars_vx = []
 
 ecuaciones_vy = []
+vars_vy = []
 
 # Funcion Vx(x, y)
 def Vx(x, y):
@@ -38,11 +39,11 @@ def Vy(x, y):
     if punto in condiciones_frontera:
         return 0
     else:
-        return Symbol("Vx_{},{}".format(x,y))
+        return Symbol("Vy_{},{}".format(x,y))
     
 # Generando las ecuaciones de Vx
 for x in range(1, 7):
-    for y in range(1, 7):
+    for y in range(1, 6):
         vx = Vx(x,y)
         vy = Vx(x,y)
         if Vx(x,y) != 0:
@@ -51,11 +52,16 @@ for x in range(1, 7):
             vars_vx.append(Vx(x,y))
 
 # Generando las ecuaciones de Vy
-# for x in range(1, 7):
-#     for y in range(1, 7):
-#         if Vy(x,y) != 0:
-#             ecuacion_no_lineal = Vx(x+1,y)*(2-vx) - 8*Vx(x,y) + Vx(x-1,y)*(2+vx) + Vx(x,y+1)*(2-vy) + Vx(x,y-1)*(2+vy)
-#             ecuaciones_vy.append(ecuacion_no_lineal)
+for x in range(1, 7):
+    for y in range(1, 6):
+        vx = Vy(x,y)
+        vy = Vy(x,y)
+        if Vy(x,y) != 0:
+            ecuacion_no_lineal = Vy(x+1,y)*(2-vx) - 8*Vy(x,y) + Vy(x-1,y)*(2+vx) + Vy(x,y+1)*(2-vy) + Vy(x,y-1)*(2+vy)
+            ecuaciones_vy.append(ecuacion_no_lineal)
+            vars_vy.append(Vy(x,y))
+
+# Funciones axiliares para implementar el metodo de Newton Raphson
 
 def jacobiano(ecuaciones, vars):
     jacobiano = []
@@ -77,7 +83,7 @@ def evalFunction(function, vars, values):
     for i in range(0, numVars):
         result = result.subs(vars[i], values[i])
     
-    return eval(str(result)) # cast sympy type to int type
+    return float(str(result)) # cast sympy type to int type
 
 def evalJacobiano(jacobiano, vars, values):
     jacobiano_evaluated = []
@@ -114,10 +120,11 @@ def stop(solution1, solution0):
 # Solucionando los sistemas
 
 TOL = 0.001
-INITIAL_POINT = [0]*len(vars_vx)
+APROXIMATION_VX = [0]*len(vars_vx)
+APROXIMATION_VY = [20]*len(vars_vx)
 
-def solveSystem(ecuacions, vars):
-    solution0 = INITIAL_POINT
+def newtonRaphson(ecuacions, vars, aproximation):
+    solution0 = aproximation
     jacobiano_ = jacobiano(ecuacions, vars)
 
     while True:
@@ -133,7 +140,19 @@ def solveSystem(ecuacions, vars):
         else:
             solution0 = solution1 
 
-print(solveSystem(ecuaciones_vx, vars_vx))
+#solution_vx = newtonRaphson(ecuaciones_vx, vars_vx, APROXIMATION_VX)
+solution_vy = newtonRaphson(ecuaciones_vy, vars_vy, APROXIMATION_VY)
 
-# print(type(Float(Symbol('x').subs(Symbol('x'), 1).evalf(), 2)))
-# print(type(eval(str(Symbol('x').subs(Symbol('x'), 1)))))
+#print(solution_vy)
+#print(solution_vx)
+
+print(solution_vy)
+#print(solution_vx)
+print('////////////////////////////////////7')
+print(evalFunctions(ecuaciones_vy, vars_vy, solution_vy))
+#print(evalFunctions(ecuaciones_vx, vars_vx, solution_vx))
+
+# [0.43495066 0.1830132  0.07819786 0.0338344  0.0129013  0.4844767
+# 0.20501969 0.0937777  0.04387608 0.0176665  0.03860489 0.02843757
+# 0.01350639 0.03155211 0.01702425 0.0076619  0.43376138 0.17933274
+# 0.07136468 0.48233503 0.19741128 0.06952999]
