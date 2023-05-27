@@ -42,6 +42,8 @@ def Vy(x, y):
         return Symbol("Vy_{},{}".format(x,y))
     
 # Generando las ecuaciones de Vx
+# Teniendo en cuenta la formula hallada al usar diferencias finitas 
+# Vx(x+1,y)*(2-vx) - 8*Vx(x,y) + Vx(x-1,y)*(2+vx) + Vx(x,y+1)*(2-vy) + Vx(x,y-1)*(2+vy)
 for x in range(1, 7):
     for y in range(1, 6):
         vx = Vx(x,y)
@@ -52,6 +54,8 @@ for x in range(1, 7):
             vars_vx.append(Vx(x,y))
 
 # Generando las ecuaciones de Vy
+# Teniendo en cuenta la formula hallada al usar diferencias finitas 
+# Vy(x+1,y)*(2-vx) - 8*Vy(x,y) + Vy(x-1,y)*(2+vx) + Vy(x,y+1)*(2-vy) + Vy(x,y-1)*(2+vy)
 for x in range(1, 7):
     for y in range(1, 6):
         vx = Vy(x,y)
@@ -146,15 +150,14 @@ def newtonRaphson(ecuacions, vars, aproximation):
         solution1 = np.array(solution0) - (jacobiano_inv.dot(functions_evaluated))
 
         if iterations >= 100 or stop(ecuacions, vars, solution1):
-            print(iterations)
             return solution1
         else:
             solution0 = solution1 
         iterations += 1
 
+# Soluciones
 solution_vx = newtonRaphson(ecuaciones_vx, vars_vx, APROXIMATION_VX)
 solution_vy = newtonRaphson(ecuaciones_vy, vars_vy, APROXIMATION_VY)
-
 
 # Imprimiendo las soluciones
 print('\n////////////////////////////////////\nSOLUCION PARA LA VELOCIDAD EN X:')
@@ -167,12 +170,12 @@ for i in range(0, len(vars_vy)):
 
 print('\n////////////////////////////////////\nPROBANDO LAS SOLUCIONES:')
 
-print('RESULTADO DE EVALUAR EL VECTOR SOLUCION DE LA VELOCIDAD EN X:')
+print('RESULTADO DE EVALUAR EL VECTOR SOLUCION DE LA VELOCIDAD EN SISTEMA DE X:')
 Vx_functions_evaluated = evalFunctions(ecuaciones_vx, vars_vx, solution_vx)
 for function_evaluated in Vx_functions_evaluated:
     print(function_evaluated)
 
-print('\nRESULTADO DE EVALUAR EL VECTOR SOLUCION DE LA VELOCIDAD EN Y:')
+print('\nRESULTADO DE EVALUAR EL VECTOR SOLUCION DE LA VELOCIDAD EN EL SISTEMA DE Y:')
 Vy_functions_evaluated = evalFunctions(ecuaciones_vy, vars_vy, solution_vy)
 for function_evaluated in Vy_functions_evaluated:
     print(function_evaluated)
