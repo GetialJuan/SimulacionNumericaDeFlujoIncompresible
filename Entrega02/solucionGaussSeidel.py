@@ -74,24 +74,27 @@ def gauss_seidel(A, b, x0, omega, tol):
         x_prev = np.copy(x)
         for i in range(n):
             sum = np.dot(A[i, :i], x[:i]) + np.dot(A[i, i + 1:], x_prev[i + 1:])
-            x[i] = (1 - omega) * x_prev[i] + (omega / A[i, i]) * (b[i] - sum)
-        norm_diff = np.linalg.norm(x - x_prev,  np.inf)/np.linalg.norm(x,  np.inf ) 
+            x[i] = (1 - omega) * x_prev[i] + (omega / A[i, i]) * (b[i] - sum)  
+        if np.linalg.norm(x, np.inf) != 0: 
+            norm_diff = np.linalg.norm(x - x_prev, np.inf) / np.linalg.norm(x, np.inf)
+        else: 
+            norm_diff = np.linalg.norm(x - x_prev, np.inf)
         if norm_diff < tol:
             break
         iteraciones += 1
     return x, iteraciones
 
+
 omega = 1.2
 tol = 0.001
 x0 = np.ones(22)
-y0 = np.ones(22)
+y0 = np.zeros(22)
 
 solucionx, iteracionesx = gauss_seidel(Ax, bx, x0, omega, tol)
-#solutiony, iteracionesy = gauss_seidel(Ay, by, y0, omega, tol)
+solutiony, iteracionesy = gauss_seidel(Ay, by, y0, omega, tol)
 
 print("Solución:", solucionx)
 print("Número de iteraciones:", iteracionesx)
 
-#print("Solución:", solutiony)
-#print("Número de iteraciones:", iteracionesy)
-
+print("Solución:", solutiony)
+print("Número de iteraciones:", iteracionesy)
