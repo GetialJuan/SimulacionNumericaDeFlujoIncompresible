@@ -59,11 +59,13 @@ print(f"¿Es simétrica la matríz?: {check_symmetric(A)}\n")
 
 
 def conjugate_gradient(A, b, x0):
-    r0 = np.subtract(b, np.dot(A, x0))
+    Ax0 = np.dot(A, x0)
+    
+    r0 = np.subtract(b, Ax0)
     d0 = r0
     TOL = 1e-3
     it = 0
-    
+
     try:
         while True:
             it += 1
