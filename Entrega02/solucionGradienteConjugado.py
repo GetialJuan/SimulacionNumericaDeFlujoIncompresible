@@ -63,6 +63,7 @@ def conjugate_gradient(A, b, x0):
     
     r0 = np.subtract(b, Ax0)
     d0 = r0
+    
     TOL = 1e-3
     it = 0
 
